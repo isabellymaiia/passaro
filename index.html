@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <title>Exercício do Pássaro</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <script>
+        // configurações iniciais do jogo como altura e largura
+        // o phaser.auto serve para que o navegador escolha automaticamente o renderizador (responsável por exibir os gráficos e animações)
+        var config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+
+            scene: {
+                preload: preload,
+                create: create,
+                update: update
+            }
+        };
+
+        var game = new Phaser.Game(config);
+
+        var passaro;
+
+        // apelida os arquivos para que seja mais fácil mencioná-los depois
+        function preload() {
+            this.load.image('bg', 'assets/bg_space.png');
+            this.load.spritesheet('passaro', 'assets/bird-purple.png', {
+                frameWidth: 75,
+                frameHeight: 75
+            });
+        }
+
+        //carrega os elementos de imagem na tela de acordo com o número das coordenadas definidas
+        function create() {
+            this.add.image(400, 300, 'bg').setScale(1.2);
+            passaro = this.add.sprite(100, 100, 'passaro').setScale(1.3);
+
+            //this.anims é objeto fornecido pelo Phaser que permite criar e gerenciar animações
+            this.anims.create({
+
+                key: 'fly', //chave usada para identificar a animação fly
+                frames: this.anims.generateFrameNumbers('passaro', {
+                    start: 0,
+                    end: 7
+                }), //sequência de números de quadros para a animação
+                frameRate: 10, //define a taxa como 10 quadros por segundo.
+                repeat: -1 // indica que a animação será repetida infinitamente
+            });
+
+            //inicia a animação
+            passaro.anims.play('fly', true);
+        }
+
+        //função para criar uma lógica que executa o movimento do pássaro na tela
+        function update() {
+
+            // Verifica se o pássaro está localizado nas coordenadas iniciais (100, 100) e define a imagem do pássaro para não ser invertida e indica que está indo para frente
+            if (passaro.x === 100 && passaro.y === 100) {
+                passaro.setFlip(false, false);
+                passaro.ida = true;
+            }
+
+            // Verifica se o pássaro está se movendo para frente (ida) e ainda não alcançou a coordenada x de destino (700) e move o pássaro 5 unidades para a direita
+            if (passaro.x < 700 && passaro.ida === true) {
+                passaro.x += 5;
+            }
+
+            // Verifica se o pássaro chegou na coordenada de virada (x: 700, y: 100) e inverte a imagem do pássaro horizontalmente e indica que deve começar a se mover para baixo
+            if (passaro.y === 100 && passaro.x === 700) {
+                passaro.setFlip(true, false);
+                passaro.desce = true;
+            }
+
+            // Verifica se o pássaro está se movendo para baixo (desce) e ainda não alcançou a coordenada y de destino (500) e move o pássaro 5 unidades para baixo
+            if (passaro.y < 500 && passaro.desce === true) {
+                passaro.y += 5;
+            }
+
+            // Verifica se o pássaro alcançou a coordenada de virada completa (x: 700, y: 500) e inverte a imagem do pássaro horizontalmente e indica que deve começar a se mover para trás
+            if (passaro.x === 700 && passaro.y === 500) {
+                passaro.setFlip(true, false);
+                passaro.ida = false;
+                passaro.desce = false;
+            }
+
+            // Verifica se o pássaro está se movendo para trás (voltando) e ainda não alcançou a coordenada x de destino (100)e move o pássaro 5 unidades para a esquerda
+            if (passaro.x > 100 && passaro.ida === false) {
+                passaro.x -= 5;
+            }
+
+            // Verifica se o pássaro alcançou a coordenada de retorno completa (x: 100, y: 500) e define a imagem do pássaro para não ser invertida
+            if (passaro.x === 100 && passaro.y === 500) {
+                passaro.setFlip(false, false);
+            }
+
+            // Verifica se o pássaro está se movendo para cima (subindo) e ainda não alcançou a coordenada y de destino (100) e move o pássaro 5 unidades para cima
+            if (passaro.y > 100 && passaro.x === 100) {
+                passaro.y -= 5;
+            }
+        }
+    </script>
+
+</body>
+
+</html>
